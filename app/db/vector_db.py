@@ -3,7 +3,7 @@ from qdrant_client.models import PointStruct, ScoredPoint
 from typing import List
 import uuid 
 from .config import init_vector_db
-from ..db import COLLECTION_NAME
+from ..db import COLLECTION_NAME, VECTOR_DIMENSION
 
 client = init_vector_db()
 
@@ -13,7 +13,7 @@ def create_collection_if_not_exists(collection_name: str):
     if not client.collection_exists(collection_name=collection_name):
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=models.VectorParams(size=768, distance=models.Distance.COSINE),
+            vectors_config=models.VectorParams(size=VECTOR_DIMENSION, distance=models.Distance.COSINE),
         )
         
         
