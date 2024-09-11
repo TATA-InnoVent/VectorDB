@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import ingestion, retrieval
+from fastapi.responses import HTMLResponse
+import os
 
 app = FastAPI()
 
@@ -17,6 +19,9 @@ app.add_middleware(
 app.include_router(ingestion.router)
 app.include_router(retrieval.router)
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {"message": "FastAPI server for Vector DB with React component retrieval"}
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "main.html")
+    with open(file_path, "r") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content)
