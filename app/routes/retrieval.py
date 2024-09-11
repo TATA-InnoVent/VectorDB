@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/retrieve/")
 async def retrieve_component(query: Query):
     query_embedding = generate_embedding(query.query_text)
-    embedding_list = query_embedding.tolist()[0]
+    embedding_list = query_embedding[0]
     results = search_vector_db(embedding_list)
 
     if not results:
