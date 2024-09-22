@@ -7,6 +7,10 @@ from ..db import COLLECTION_NAME, VECTOR_DIMENSION
 
 client = init_vector_db()
 
+TEMPLATE_COMPONENT_CODE = (
+    "const {component_name} = () => { return <div>This is a template component for {component_name}.</div>; };"
+)
+
 def create_collection_if_not_exists(collection_name: str):
     """Ensure that the collection exists before using it."""
 
@@ -29,18 +33,43 @@ def add_to_vector_db(component_name: str, component_code: str, embedding: List[f
     )
     client.upsert(collection_name=COLLECTION_NAME, points=[point])
 
-def search_vector_db(query_embedding: List[float], limit: int = 5) -> List[ScoredPoint]:
-    """Search for the most similar points to the query embedding in the specified collection."""
+
+def search_vector_db(query_embedding: List[float], component_name: str, limit: int = 5) -> List[models.ScoredPoint]:
+    """Search for the most similar points to the query embedding with a filter on component_code."""
+    
     create_collection_if_not_exists(COLLECTION_NAME)
-    print(f"Searching with vector: {query_embedding[:5]}...")
+    print(f"Searching with vector: {query_embedding[:5]} and component code: {component_name}...")
+
+    # Define the filter for component_code
+    keyword_filter = models.Filter(
+        must=[
+            models.FieldCondition(
+                key="component_name",
+                match=models.MatchValue(value=component_name)
+            )
+        ]
+    )
+
     results = client.search(
         collection_name=COLLECTION_NAME,
-        query_vector=query_embedding,
+        query_vector=query_embedding,  
+        query_filter=keyword_filter,
         limit=limit,
         with_payload=True
     )
-    return results
-
+    if not results:
+        print("No results found, returning template component code...")
+        return {
+            "component_name": component_name,
+            "component_code": TEMPLATE_COMPONENT_CODE.replace("{component_name}", component_name)
+        }
+        
+    formatted_result = {
+        "component_name": results[0].payload["component_name"],
+        "component_code": results[0].payload["component_code"]
+    }
+    return formatted_result
+    
 # # Example usage
 # embedding = [0.1, 0.2, 0.3]  # Example vector
 # component_name = "example_component"

@@ -6,3 +6,4 @@ class ComponentIngestion(BaseModel):
 
 class Query(BaseModel):
     query_text: str
+    component_name: str

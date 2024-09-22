@@ -49,16 +49,20 @@
         </form>
         <form id="promptForm" class="w-1/2">
             <div class="form-group mb-4">
-                <label for="prompt" class="block mb-2">Prompt</label>
-                <input type="text" id="prompt" name="prompt" class="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white" required>
+            <label for="prompt" class="block mb-2">Query</label>
+            <input type="text" id="prompt" name="prompt" class="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white" required>
             </div>
             <div class="form-group mb-4">
-                <label for="generatedCode" class="block mb-2">Generated Code</label>
-                <textarea id="generatedCode" name="generatedCode" rows="5" class="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white" readonly></textarea>
+            <label for="fileNameQuery" class="block mb-2">File Name</label>
+            <input type="text" id="fileNameQuery" name="fileNameQuery" class="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white" required>
+            </div>
+            <div class="form-group mb-4">
+            <label for="generatedCode" class="block mb-2">Retrieved Code</label>
+            <textarea id="generatedCode" name="generatedCode" rows="5" class="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white" readonly></textarea>
             </div>
             <div class="form-group flex justify-between gap-4">
-                <button type="button" class="w-1/2 p-2 bg-blue-600 rounded text-white" onclick="copyToClipboard()">Copy Code</button>
-                <button type="submit" class="w-1/2 p-2 bg-blue-600 rounded text-white">Submit</button>
+            <button type="button" class="w-1/2 p-2 bg-blue-600 rounded text-white" onclick="copyToClipboard()">Copy Code</button>
+            <button type="submit" class="w-1/2 p-2 bg-blue-600 rounded text-white">Submit</button>
             </div>
         </form>
     </div>
@@ -102,13 +106,14 @@
         document.getElementById('promptForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const prompt = document.getElementById('prompt').value;
+            const fileNameQuery = document.getElementById('fileNameQuery').value;
 
             fetch('http://127.0.0.1:8000/retrieve', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ "query_text": prompt })
+                body: JSON.stringify({ "query_text":prompt, "component_name": fileNameQuery})
             })
             .then(response => response.json())
             .then(data => {
